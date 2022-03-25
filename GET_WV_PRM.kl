@@ -1,0 +1,93 @@
+PROGRAM GET_WV_PRM
+-------------------------------------------------------------------------------
+
+%NOLOCKGROUP
+%ENVIRONMENT sysdef
+%ENVIRONMENT regope
+
+VAR
+	STS, entry, turn, i_TMP, data_type, Proc, Sched, CNT  : INTEGER
+	S_tmp, S_path1, S_path2 : STRING[32]
+	real_flag: BOOLEAN
+	D, w_vel, Sin_vel, r_TMP: REAL
+	
+	T0, Tup, Aup, Aos, Ais, Rc, Ros, Ris, V1,V2: REAL
+
+	WV_Amp IN CMOS FROM Surf_bank : REAL		
+	WV_Freq IN CMOS FROM Surf_bank: REAL 			
+	WV_Out_Delay IN CMOS FROM Surf_bank: REAL		
+	WV_IN_Delay IN CMOS FROM Surf_bank: REAL	
+BEGIN 
+-- load parameters
+	--diamter
+	GET_TPE_PRM(1, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	D = i_TMP + r_Tmp
+
+	--direction of turn 
+	GET_TPE_PRM(2, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	turn = ROUND( i_TMP + r_Tmp)
+	
+	--weld Procedure
+	GET_REG (10, real_flag, Proc, r_Tmp,STS)
+	CNV_INT_STR (Proc,0,10,S_TMP)
+	S_Path1 = 'AWE1WP01'--+ S_TMP it's need to subtract blanck space befo syble 
+	
+	--weld sched
+	GET_REG (11,real_flag, Sched, r_Tmp,STS)
+	CNV_INT_STR (Sched,0,10,S_TMP)
+	S_Path2 = 'SCH['+ S_TMP +'].$CMD_WSPEED'	
+	
+
+
+	GET_VAR(entry, S_Path1, S_Path2, w_vel,  STS)
+	
+	GET_REG (59,real_flag, CNT, r_Tmp,STS)
+
+
+------------calculate----------
+--radius
+	Rc = D/2
+	Ros = Rc + WV_Amp
+	Ris = Rc - WV_Amp
+
+--time up/down
+	T0 = 1/WV_Freq
+	Tup = T0 /4
+	
+--angle size  of up/down  motion
+	Aup = w_vel * Tup *60/ ( 3.14 * D)
+
+--angle size  of outside delay
+	Aos = w_vel * WV_Out_Delay *60 / ( 3.14 * D)
+
+--angle size  of  inside delay
+	Ais = w_vel * WV_IN_Delay *60 / ( 3.14 * D)
+
+-- determ sign of angle
+	IF turn=0 THEN
+		Aup = -Aup
+		Aos = -Aos
+		Ais = -Ais
+	ENDIF
+
+--velocity  of up/down move
+	r_Tmp = W_vel*Tup/6
+	Sin_vel = w_vel / COS( ATAN2(r_Tmp, WV_Amp) )
+
+-- scalling velocity
+	V1 = sin_vel*100 / CNT
+	V2 = w_vel*100 / CNT	
+	
+--write result
+	SET_REAL_REG(51, V2, STS)
+	SET_REAL_REG(52, Rc, STS)
+	SET_REAL_REG(53, V1, STS)
+	SET_REAL_REG(54, Ros, STS)
+	SET_REAL_REG(55, Ris, STS)
+	SET_REAL_REG(56, Aup, STS)
+	SET_REAL_REG(57, Aos, STS)
+	SET_REAL_REG(58, Ais, STS)
+	SET_REAL_REG(60, WV_Out_Delay, STS)
+	SET_REAL_REG(61, WV_IN_Delay, STS)
+	
+END GET_WV_PRM

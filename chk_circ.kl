@@ -1,0 +1,57 @@
+PROGRAM CHK_CIRC
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+STS : INTEGER 
+
+	
+	PNULL IN CMOS FROM Surf_bank : XYZWPR
+	dR,dAx,dX IN CMOS FROM Surf_bank : REAL
+
+	Tmp_frm, CNT1, CNT2, P1,P2,P3,P4 : XYZWPR
+	D,R1,R2 : REAL
+
+	r_Tmp : REAL
+	data_type, i_tmp: INTEGER
+	s_Tmp: STRING[8]
+	b_t : BOOLEAN
+
+
+
+
+ROUTINE CALC_CNTR(P1,P2,P3, C : XYZWPR; R: REAL) FROM Math_Lib
+ROUTINE Dist (P1, P2: XYZWPR) :REAL FROM Math_Lib
+-------------------------------------------------------------------------------
+BEGIN
+
+----load point of mesurment	
+	GET_TPE_PRM(1, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P1 = GET_POS_REG(i_TMP,STS,1)
+
+	GET_TPE_PRM(2, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P2 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(3, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P3 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(4, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P4 = GET_POS_REG(i_TMP,STS,1)
+
+-- 1st  tri point	
+	CALC_CNTR(P1,P2,P3,CNT1,R1)	
+	
+-- 2nd trio point
+	CALC_CNTR(P2,P3,P4,CNT2,R2)	
+			
+	D = dist(CNT1, CNT2)
+	
+	IF (ABS(R2-R1)<dR) AND (D < dR) THEN
+		SET_INT_REG(13,0,STS)
+	else
+		SET_INT_REG(13,1,STS)
+	ENDIF
+	
+		
+	
+END CHK_CIRC

@@ -1,0 +1,93 @@
+PROGRAM clc_srf_pnt
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+STATUS : INTEGER 
+
+	pos_phs IN CMOS FROM Surf_bank : REAL
+	PSR_en IN CMOS FROM Surf_bank : BOOLEAN
+	pos_conf IN CMOS FROM Surf_bank : CONFIG
+	PNULL IN CMOS FROM Surf_bank : XYZWPR
+	Count IN CMOS FROM Surf_bank : INTEGER
+	
+	ORI_rel IN CMOS FROM Surf_bank : BOOLEAN
+	ORI_W, ORI_P, ORI_R IN CMOS FROM Surf_bank : REAL
+
+	Ofs, Point, P1,P2,P3 : XYZWPR
+	Z,R,alf : REAL
+
+	r_Tmp : REAL
+	data_type, i_tmp: INTEGER
+	s_Tmp: STRING[8]
+	b_t : BOOLEAN
+	Jpos_ar : ARRAY [6] OF REAL
+	ext_pos: JOINTPOS6
+
+
+--------------------------------------------------------------------------------------------------
+BEGIN
+--------------------------------------------------------------------------------------------------
+
+--===============LOAD parameters===================
+--Z distination coordinate
+	GET_TPE_PRM(1, data_type, i_Tmp, r_TMP, s_Tmp, STATUS)
+	Z = i_Tmp + r_Tmp
+	
+--R distination coordinate
+	GET_TPE_PRM(2, data_type, i_Tmp, r_TMP, s_Tmp, STATUS)
+	R = i_Tmp + r_Tmp
+
+--Alfa distination coordinate
+	GET_TPE_PRM(3, data_type, i_Tmp, r_TMP, s_Tmp, STATUS)
+	Alf = i_Tmp + r_Tmp
+
+--Offset frame 
+	Ofs = GET_POS_REG(10,STATUS,1)
+	
+		
+--=================CALCULATION===================	
+	P1= PNULL
+	P3 = PNULL
+	P2 = PNULL
+	
+	P1.Z = Z
+	P1.R = Alf + pos_phs
+	
+	P2.X = R
+	
+	IF NOT(ORI_REL) THEN
+		P2.W = ORI_W
+		P2.P = ORI_P
+		P2.R = ORI_R
+		
+		P3.R = - Alf - pos_phs
+	ELSE
+		P3.W = ORI_W
+		P3.P = ORI_P
+		P3.R = ORI_R
+	ENDIF
+	
+	Point = Ofs : P1: P2 : P3
+	Point.CONFIG_DATA = pos_conf
+	
+	FOR i_TMP = 1 TO 6 DO
+		Jpos_ar[i_Tmp] = 0
+	ENDFOR
+
+	--demonstration counter
+--	COUNT = COUNT + 1
+--	IF COUNT >=10000 THEN
+--		Point = PNULL
+--	ENDIF
+	
+	IF PSR_EN THEN
+		Jpos_ar[1]=-Alf
+	ENDIF
+ 	CNV_REL_JPOS(Jpos_ar, ext_pos, STATUS)
+		
+	SET_POS_REG(11, Point, STATUS,1)
+	SET_JPOS_REG(11,ext_pos,STATUS,2)
+	
+
+END clc_srf_pnt

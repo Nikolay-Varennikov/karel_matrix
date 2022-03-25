@@ -1,0 +1,124 @@
+PROGRAM mAth_lib
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+--=================fill frame for coordinate============================
+ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR 
+VAR
+	RES : XYZWPR
+	
+BEGIN
+	RES.X = X
+	RES.Y = Y
+	RES.Z = Z
+	RES.W = W
+	RES.P = P
+	RES.R = R
+	
+	RETURN(RES)
+END Fill_PRM
+
+--=================distance betwin to point============================
+ROUTINE Dist(P1,P2: XYZWPR): REAL 
+VAR
+	d : REAL
+
+BEGIN
+	D=  (P2.z-P1.z)*(P2.z-P1.z) 
+	D=  D + (P2.y-P1.y)*(P2.y-P1.y) 
+	D=  D + (P2.x-P1.x)*(P2.x-P1.x) 
+	D = SQRT (D)
+	RETURN(D)
+END Dist
+
+--=================centr and radius==================================
+ROUTINE Calc_circ(P1,P2,P3,C : XYZWPR; R: REAL )
+VAR
+ X1,X2,X3, Y1,Y2,Y3, M1,M2 : REAL
+
+BEGIN
+	--calculate centr of circle
+	X1=P1.X
+	X2=P2.X
+	X3=P3.X
+
+	Y1=P1.Y
+	Y2=P2.Y
+	Y3=P3.Y
+	
+	M1=(Y2-Y1) / (X2-X1)
+	M2=(Y3-Y2) / (X3-X2)
+	
+	C.X=(M1*M2*(y1-y3) + M2*(X1+X2) - M1*(X2+X3)) / (2*(M2-M1)) --X coordinate
+		
+	C.Y=((X2+X3)/2 - C.X)/M2 + (Y2+Y3)/2 --Y coordinate
+
+	C.Z = 0
+	C.W = 0
+	C.P = 0
+	C.R = 0
+	
+			
+	--calc radius of pipe,
+	R = SQRT((C.x-P1.x)*(C.x-P1.x) + (C.y-P1.y)*(C.y-P1.y) )
+		
+
+END Calc_circ
+
+--=================centr of mass===========================
+ROUTINE CNTR_GRAV(P1,P2,P3,P4: XYZWPR): XYZWPR 
+VAR
+	Res : XYZWPR
+
+BEGIN
+	Res.X = (P1.X + P2.X + P3.X + P4.X)/4
+	Res.Y = (P1.Y + P2.Y + P3.Y + P4.Y)/4
+	Res.Z = (P1.Z + P2.Z + P3.Z + P4.Z)/4
+	Res.W = 0
+	Res.P = 0
+	Res.R = 0
+	
+	RETURN(RES)
+END CNTR_GRAV
+
+
+--=================centr of  circl in 3D===========================
+ROUTINE CALC_CNTR(P1,P2,P3, C : XYZWPR; R: REAL)
+VAR
+	TMP_FRM, rP1, rP2, rP3 : XYZWPR
+
+BEGIN
+	
+		--calculate temporary frame
+	TMP_FRM = FRAME(P1,P3,P2)
+	
+	--calculate realtive coord  rel TMP_FRM
+	rP1 = INV(TMP_FRM) : P1
+	rP2 = INV(TMP_FRM) : P2
+	rP3 = INV(TMP_FRM) : P3
+		
+	--calculate Circl
+	Calc_circ(rP1, rP2, rP3, C, R)
+	
+	--calc cnt in ORIGIN frame
+	C = TMP_FRM : C 
+
+END CALC_CNTR
+--=========================
+
+--=================Projection Point to XY of FRM===========================
+ROUTINE Proj_XY (Point, FRM: XYZWPR): XYZWPR
+VAR
+	TMP_FRM: XYZWPR
+
+BEGIN
+	TMP_FRM = INV(FRM) : Point
+	TMP_FRM. Z = 0
+	
+	TMP_FRM = FRM : TMP_FRM
+	
+	RETURN(TMP_FRM)
+END Proj_XY
+--=========================
+BEGIN
+END math_lib 

@@ -1,0 +1,32 @@
+PROGRAM SET_ORI
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+	ORI_W, ORI_P, ORI_R IN CMOS FROM Surf_bank : REAL
+
+	r_Tmp : REAL
+	Sts, data_type, i_tmp: INTEGER
+	s_TMP : string[8]
+
+
+--------------------------------------------------------------------------------------------------
+BEGIN
+--------------------------------------------------------------------------------------------------
+
+--===============LOAD parameters===================
+--W -angle of distination orientation
+	GET_TPE_PRM(1, data_type, i_Tmp, r_TMP, s_Tmp, Sts)
+	ORI_W = i_Tmp + r_Tmp
+	
+--P -angle of distination orientation
+	GET_TPE_PRM(2, data_type, i_Tmp, r_TMP, s_Tmp, Sts)
+	ORI_P = i_Tmp + r_Tmp
+
+--R -angle of distination orientation
+	GET_TPE_PRM(3, data_type, i_Tmp, r_TMP, s_Tmp, Sts)
+	ORI_R = i_Tmp + r_Tmp
+	
+
+	
+END SET_ORI

@@ -1,0 +1,52 @@
+PROGRAM clc_crd
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+STS : INTEGER 
+
+	pos_phs IN CMOS FROM Surf_bank : REAL
+
+	Ofs, Point, P1 : XYZWPR
+	Z,R,alf : REAL
+
+
+
+--------------------------------------------------------------------------------------------------
+BEGIN
+--------------------------------------------------------------------------------------------------
+
+--===============LOAD parameters===================
+--current position
+	Point = GET_POS_REG(11,STS,1)
+
+--Offset frame 
+	Ofs = GET_POS_REG(10,STS,1)
+	
+		
+--=================CALCULATION===================	
+--calc  relative coordinate
+	P1= INV(OFS) : Point
+	
+--calc cylindrical coordinate
+	Z = P1.Z
+	
+	IF (abs(P1.X)< 0.01) AND (abs(P1.Y) < 0.01) THEN
+		alf=0
+	else
+		alf = ATAN2(P1.X,P1.Y)
+	ENDIF
+	
+	IF alf <>0 THEN
+		R = P1.Y / SIN(alf)
+	ELSE
+		R = P1.X
+	ENDIF
+	alf = alf - pos_phs
+	
+--save result
+	SET_REAL_REG(50, Z, STS)	
+	SET_REAL_REG(51, R, STS)	
+	SET_REAL_REG(52, alf, STS)	
+		
+END clc_crd

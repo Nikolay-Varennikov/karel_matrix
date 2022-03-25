@@ -1,0 +1,90 @@
+PROGRAM CALC_AX_FRM
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+STS : INTEGER 
+
+	
+	PNULL IN CMOS FROM Surf_bank : XYZWPR
+	dR,dAx,dX IN CMOS FROM Surf_bank : REAL
+
+	Tmp_frm, C1, C2, C3, C4, C00, C01, C02, P1,P2,P3,P4, P5, P6, P7, P8 : XYZWPR
+	REF_frm : XYZWPR
+	
+	R : REAL
+
+	r_Tmp : REAL
+	data_type, i_tmp: INTEGER
+	s_Tmp: STRING[8]
+	b_t : BOOLEAN
+
+
+
+
+ROUTINE Calc_CNTR (P1, P2, P3, C: XYZWPR; R:REAL) FROM Math_Lib
+ROUTINE Dist (P1, P2: XYZWPR) :REAL FROM Math_Lib
+ROUTINE CNTR_GRAV(P1,P2,P3,P4: XYZWPR): XYZWPR FROM Math_Lib
+ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR FROM Math_Lib
+-------------------------------------------------------------------------------
+BEGIN
+
+----load point of mesurment	
+	GET_TPE_PRM(1, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P1 = GET_POS_REG(i_TMP,STS,1)
+
+	GET_TPE_PRM(2, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P2 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(3, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P3 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(4, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P4 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(5, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P5 = GET_POS_REG(i_TMP,STS,1)
+
+	GET_TPE_PRM(6, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P6 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(7, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P7 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(8, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P8 = GET_POS_REG(i_TMP,STS,1)
+	
+-- load  referent frame
+	REF_frm = GET_POS_REG(10,STS)
+	
+-- calc  1st  sets of point	
+	CALC_CNTR(P1, P2, P3, C1, R)
+	CALC_CNTR(P2, P3, P4, C2, R)
+	CALC_CNTR(P3, P4, P1, C3, R)
+	CALC_CNTR(P4, P1, P2, C4, R)
+	
+	C01 = CNTR_GRAV(C1, C2, C3, C4)
+	
+-- calc  2nd  sets of point	
+	CALC_CNTR(P5, P6, P7, C1, R)
+	CALC_CNTR(P6, P7, P8, C2, R)
+	CALC_CNTR(P7, P8, P5, C3, R)
+	CALC_CNTR(P8, P5, P6, C4, R)
+	
+	C02 = CNTR_GRAV(C1, C2, C3, C4)
+	
+-- ñalc Frame with X align to cilinder axis	
+	
+	C00 = FRAME(C01, C02, REF_FRM : Fill_PRM(1000,0,0,0,0,0))
+	
+-- allign  to edge points 
+--!!!!!!!!!!!!!!!!!! NOT strong method!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	C01 = INV(C00) : REF_FRM --cross point XY ref plane and Cylinder Axis
+	
+	C00 = C00 : Fill_prm(C01.x, 0, 0, 0, 90, 0) -- ofset origin COO to C01 and till Z->X
+	
+	C00 = C00 : Fill_prm(0, 0, 0, 0, 0, 90)	--Till X->Y
+	
+	SET_POS_REG(11,C00,STS,1)
+	
+END CALC_AX_FRM

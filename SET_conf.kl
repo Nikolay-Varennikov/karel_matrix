@@ -1,0 +1,24 @@
+PROGRAM SET_conf
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+
+	pos_conf IN CMOS FROM Surf_bank : CONFIG
+	Source : XYZWPR
+	Sts: INTEGER
+
+
+--------------------------------------------------------------------------------------------------
+BEGIN
+--------------------------------------------------------------------------------------------------
+
+--===============LOAD parameters===================
+--Source position 
+	Source = GET_POS_REG(12,STS,1)
+	
+		
+--=================UPLOAD==================	
+	POS_conf = Source.CONFIG_DATA
+	
+END SET_conf

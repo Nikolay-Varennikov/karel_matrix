@@ -1,0 +1,34 @@
+PROGRAM WAVE
+-------------------------------------------------------------------------------
+
+%NOLOCKGROUP
+%ENVIRONMENT sysdef
+%ENVIRONMENT regope
+
+VAR
+	STS, i_TMP, data_type : INTEGER
+	S_tmp, S_path : STRING[32]
+	real_flag: BOOLEAN
+	r_TMP: REAL
+
+
+	WV_Amp IN CMOS FROM Surf_bank : REAL		
+	WV_Freq IN CMOS FROM Surf_bank: REAL 			
+	WV_Out_Delay IN CMOS FROM Surf_bank: REAL		
+	WV_IN_Delay IN CMOS FROM Surf_bank: REAL	
+
+BEGIN 
+-- load parameters
+	GET_TPE_PRM(1, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	WV_Amp = i_TMP + r_TMP
+	
+	GET_TPE_PRM(2, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	WV_Freq = i_TMP + r_TMP
+	
+	GET_TPE_PRM(3, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	WV_Out_Delay = i_TMP + r_TMP
+	
+	GET_TPE_PRM(4, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	WV_IN_Delay  = i_TMP + r_TMP
+	
+END Wave

@@ -1,0 +1,98 @@
+PROGRAM CALC_EDG_FRM
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+STS : INTEGER 
+
+	
+	PNULL IN CMOS FROM Surf_bank : XYZWPR
+	dR,dAx,dX IN CMOS FROM Surf_bank : REAL
+
+	Plane, C1, C2, C3, C4, C01, P1,P2,P3,P4, P5, P6, P7 : XYZWPR
+	
+	REF_frm : XYZWPR
+	
+	R : REAL
+
+	r_Tmp : REAL
+	data_type, i_tmp: INTEGER
+	s_Tmp: STRING[8]
+	b_t : BOOLEAN
+
+
+
+
+ROUTINE Calc_CNTR (P1, P2, P3, C: XYZWPR; R:REAL) FROM Math_Lib
+ROUTINE Dist (P1, P2: XYZWPR) :REAL FROM Math_Lib
+ROUTINE CNTR_GRAV(P1,P2,P3,P4: XYZWPR): XYZWPR FROM Math_Lib
+ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR FROM Math_Lib
+ROUTINE Proj_XY (Point, FRM: XYZWPR): XYZWPR FROM Math_Lib
+-------------------------------------------------------------------------------
+BEGIN
+
+----load point of mesurment	
+	GET_TPE_PRM(1, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P1 = GET_POS_REG(i_TMP,STS,1)
+
+	GET_TPE_PRM(2, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P2 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(3, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P3 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(4, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P4 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(5, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P5 = GET_POS_REG(i_TMP,STS,1)
+
+	GET_TPE_PRM(6, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P6 = GET_POS_REG(i_TMP,STS,1)
+	
+	GET_TPE_PRM(7, data_type, i_Tmp, r_TMP, s_Tmp, STS)
+	P7 = GET_POS_REG(i_TMP,STS,1)
+	
+-- load  referent frame
+	REF_frm = GET_POS_REG(10,STS)	
+	
+--Calculate Frame which alligned  with measured PLATE
+	Plane = FRAME(P5,P7,P6)
+		
+-- calc Projection of measurment point
+	P1 = Proj_XY(P1, Plane)
+	P2 = Proj_XY(P2, Plane)
+	P3 = Proj_XY(P3, Plane)
+	P4 = Proj_XY(P4, Plane)
+
+-- calc  centr of 4 circul	
+	CALC_CNTR(P1, P2, P3, C1, R)
+	CALC_CNTR(P2, P3, P4, C2, R)
+	CALC_CNTR(P3, P4, P1, C3, R)
+	CALC_CNTR(P4, P1, P2, C4, R)
+	
+-- averaging centr
+	C1 = CNTR_GRAV(C1, C2, C3, C4)
+
+--offset frame to centr
+	Plane.X = C1.X
+	Plane.Y = C1.Y
+	Plane.Z = C1.Z	
+	
+--get X &Y direction from REF_FRM	
+	C1 = Proj_XY(REF_frm, Plane)
+	C2 = Proj_XY(REF_frm:Fill_Prm(1000,0,0, 0,0,0), Plane)
+	C3 = Proj_XY(REF_frm:Fill_Prm(0,1000,0, 0,0,0), Plane)
+
+--get frame in Plate and allign with REF_FRM		
+	C1 = FRAME(C1,C2,C3)
+	
+	Plane.W = C1.W
+	Plane.P = C1.P		
+	Plane.R = C1.R	
+	
+	
+-- save results	
+	SET_POS_REG(11,PLANE,STS)
+
+END CALC_EDG_FRM

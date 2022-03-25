@@ -1,0 +1,17 @@
+PROGRAM Matrix_lib
+-------------------------------------------------------------------------------
+--%ENVIRONMENT REGOPE
+
+--=================fill MATRIX============================
+ROUTINE DEF_MX(M1 : ARRAY[*,*] OF REAL): ARRAY[*,*] OF REAL
+VAR 
+	Mx :ARRAY[*,*] OF REAL
+	size : INTEGER
+BEGIN
+	size = ARRAY_LEN(M1)
+	
+END DEF_MX
+--=========================
+BEGIN
+	
+END Matrix_lib 

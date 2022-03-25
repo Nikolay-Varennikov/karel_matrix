@@ -1,0 +1,37 @@
+PROGRAM Surf_BANK
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+%NOLOCKGROUP
+%CMOSVARS
+
+VAR
+	pos_phs : REAL		--phase of point
+	PSR_en : BOOLEAN	--POSITIONER enable
+	pos_conf : CONFIG	--configuration
+	ORI_rel : BOOLEAN	--enable relation orintation from position
+	ORI_W, ORI_P, ORI_R : REAL--W,P, R angle of tool orientation
+	dR,dAx,dX : REAL		-- tolerance of Radius, Concentrical, platible
+	PNULL : XYZWPR		--NULLframe
+	COUNT : INTEGER		--count of program
+
+	ALF, ALF_POZ, X_TEK, Y_TEK : REAL
+	
+	WV_Amp : REAL		
+	WV_Freq : REAL 			
+	WV_Out_Delay : REAL		
+	WV_IN_Delay : REAL
+	
+	
+
+-------------------------------------------------------------------------------
+BEGIN -- A part of program execution
+-------------------------------------------------------------------------------
+	Count = 0
+	PNULL.X = 0
+	PNULL.Y = 0
+	PNULL.Z = 0
+	PNULL.W = 0
+	PNULL.P = 0
+	PNULL.R = 0
+ 
+END Surf_BANK

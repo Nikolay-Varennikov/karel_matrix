@@ -2,6 +2,7 @@ PROGRAM mAth_lib
 -------------------------------------------------------------------------------
 %ENVIRONMENT REGOPE
 
+ROUTINE fill_MX(A11, A12, A13, A21, A22, A23, A31, A32, A33 :  REAL)  : ARRAY[*,*] OF REAL FROM Matrix_lib
 --=================fill frame for coordinate============================
 ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR 
 VAR
@@ -120,5 +121,28 @@ BEGIN
 	RETURN(TMP_FRM)
 END Proj_XY
 --=========================
+
+--=================Crossing Point of line and plate===========================
+ROUTINE Cross_PNT (F_L, F_P: XYZWPR): XYZWPR -- frame line frame plate
+VAR
+	pl1, pl2, pl3, pl4, pp1, pp2, pp3 , TMP_FRM: XYZWPR
+	Mx,Ma, Mc : ARRAY [3,3] OF REAL 
+	
+
+BEGIN
+	Pl1 = F_L
+	Pl2 = F_L : fill_prm(0,0,1000,	0,0,0)
+	Pl3 = F_L : fill_prm(0,1000,500,	0,0,0)
+	Pl4 = F_L : fill_prm(1000,0,500,	0,0,0)
+	Ma = fill_MX(0,0,0,
+				  0,0,0,
+				  0,0,0)
+	
+	
+	
+	RETURN(TMP_FRM)
+END Cross_PNT
+--=========================
+
 BEGIN
 END math_lib 

@@ -81,7 +81,7 @@ BEGIN
 	RETURN(Mx)
 END sub_MX
 
---=================determinate MATRIX============================
+--=================determinat of MATRIX============================
 ROUTINE det_MX(A : ARRAY[*,*] OF REAL):  REAL
 VAR 
 	det : REAL
@@ -95,6 +95,68 @@ BEGIN
 	
 	RETURN(det)
 END det_MX
+--=========================
+
+--=================fill MATRIX============================
+ROUTINE fill_MX(A11, A12, A13, A21, A22, A23, A31, A32, A33 :  REAL)  : ARRAY[*,*] OF REAL
+VAR 
+	Mx: ARRAY [3,3] OF REAL
+BEGIN
+
+	Mx[1,1] =A11	
+	Mx[1,2] =A12
+	Mx[1,3] =A13
+	Mx[2,1] =A21
+	Mx[2,2] =A22
+	Mx[2,3] =A23
+	Mx[3,1] =A31
+	Mx[3,2] =A32
+	Mx[3,3] =A33
+		
+	RETURN(Mx)
+END fill_MX
+
+--=================Kramer method============================
+ROUTINE kramer(A, D: ARRAY [*,*] OF REAL)  : ARRAY[*,*] OF REAL
+VAR 
+	X: ARRAY [3,3] OF REAL
+	D0, D1, D2, D3 : REAL
+	i : INTEGER
+BEGIN
+
+	D0 = det_mx(A) --calc main determinant
+	IF D0 <>0 THEN -- check Kramer Ok
+		-- fill 1 extended matrix
+		X = A
+		FOR i = 1 TO 3 DO
+			X[i,1] = D[i,1]
+		ENDFOR
+		
+		D1 = det_Mx(X) -- 1st det
+		
+		-- fill 2 extended matrix
+		X = A
+		FOR i = 1 TO 3 DO
+			X[i,2] = D[i,1]
+		ENDFOR
+		
+		D2 = det_Mx(X) -- 2nd det
+		
+		-- fill 3 extended matrix
+		X = A
+		FOR i = 1 TO 3 DO
+			X[i,3] = D[i,1]
+		ENDFOR
+		
+		D3 = det_Mx(X) -- 1st det
+	ENDIF
+		
+		x= fill_Mx ( D1/D0, 0 , 0,
+				     D2/D0, 0 , 0,
+				     D3/D0, 0 , 0)
+		
+	RETURN(X)
+END kramer
 --=========================
 BEGIN
 	

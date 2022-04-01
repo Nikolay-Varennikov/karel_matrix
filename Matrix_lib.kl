@@ -2,15 +2,99 @@ PROGRAM Matrix_lib
 -------------------------------------------------------------------------------
 --%ENVIRONMENT REGOPE
 
---=================fill MATRIX============================
-ROUTINE DEF_MX(M1 : ARRAY[*,*] OF REAL): ARRAY[*,*] OF REAL
+--=================multiplicate MATRIX============================
+ROUTINE MUL_MX(A, B : ARRAY[*,*] OF REAL): ARRAY[*,*] OF REAL
 VAR 
-	Mx :ARRAY[*,*] OF REAL
-	size : INTEGER
+	Mx :ARRAY[3,3] OF REAL
+	size, i, j, k, STS : INTEGER
 BEGIN
-	size = ARRAY_LEN(M1)
+	size = ARRAY_LEN(A)
 	
-END DEF_MX
+--	CREATE_VAR ('', 'Mx', '', 'real', Size, Size, 0, 0, sts)
+	
+	FOR i=1 TO size DO
+		FOR j=1 TO size DO
+			Mx[i,j] = 0
+			FOR k =1 TO size DO
+				Mx[i,j] = Mx[i,j] + A[i,k]*B[k,j]
+			ENDFOR
+		ENDFOR
+	ENDFOR
+	
+	RETURN(Mx)
+END MUL_MX
+
+--=================scale MATRIX============================
+ROUTINE SCAL_MX(A : ARRAY[*,*] OF REAL; c: REAL): ARRAY[*,*] OF REAL
+VAR 
+	Mx :ARRAY[3,3] OF REAL
+	size, i, j, STS : INTEGER
+BEGIN
+	size = ARRAY_LEN(A)
+	
+--	CREATE_VAR ('', 'Mx', '', 'real', Size, Size, 0, 0, sts)
+	
+	FOR i=1 TO size DO
+		FOR j=1 TO size DO	
+			Mx[i,j] = A[i,j]*C
+		ENDFOR
+	ENDFOR
+	
+	RETURN(Mx)
+END SCAL_MX
+
+--=================add MATRIX============================
+ROUTINE ADD_MX(A, B : ARRAY[*,*] OF REAL): ARRAY[*,*] OF REAL
+VAR 
+	Mx :ARRAY[3,3] OF REAL
+	size, i, j, k, STS : INTEGER
+BEGIN
+	size = ARRAY_LEN(A)
+	
+--	CREATE_VAR ('', 'Mx', '', 'real', Size, Size, 0, 0, sts)
+	
+	FOR i=1 TO size DO
+		FOR j=1 TO size DO
+			Mx[i,j] = A[i,j]+B[i,j]
+		ENDFOR
+	ENDFOR
+
+	RETURN(Mx)
+END ADD_MX
+
+--=================subtract MATRIX============================
+ROUTINE sub_MX(A, B : ARRAY[*,*] OF REAL): ARRAY[*,*] OF REAL
+VAR 
+	Mx :ARRAY[3,3] OF REAL
+	size, i, j, k, STS : INTEGER
+BEGIN
+	size = ARRAY_LEN(A)
+	
+--	CREATE_VAR ('', 'Mx', '', 'real', Size, Size, 0, 0, sts)
+	
+	FOR i=1 TO size DO
+		FOR j=1 TO size DO
+			Mx[i,j] = A[i,j]-B[i,j]
+		ENDFOR
+	ENDFOR
+	
+	RETURN(Mx)
+END sub_MX
+
+--=================determinate MATRIX============================
+ROUTINE det_MX(A : ARRAY[*,*] OF REAL):  REAL
+VAR 
+	det : REAL
+	size, i, j, k, STS : INTEGER
+BEGIN
+	size = ARRAY_LEN(A)
+	
+--	CREATE_VAR ('', 'Mx', '', 'real', Size, Size, 0, 0, sts)
+
+	det=A[1,1]*A[2,2]*A[3,3] - A[1,1]*A[2,3]*A[3,2] - A[1,2]*A[2,1]*A[3,3] + A[1,2]*A[2,3]*A[3,1]+A[1,3]*A[2,1]*A[3,2]-A[1,3]*A[2,2]*A[3,1]
+	
+	RETURN(det)
+END det_MX
 --=========================
 BEGIN
 	

@@ -1,0 +1,49 @@
+PROGRAM Test_MX
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+STS, i,j : INTEGER 
+A1, A2, A3 : ARRAY [3,3] OF REAL
+
+
+ROUTINE MUL_MX(M1, M2 : ARRAY[*,*] OF REAL): ARRAY[*,*] OF REAL FROM Matrix_lib
+ROUTINE det_MX(A : ARRAY[*,*] OF REAL):  REAL FROM Matrix_lib
+
+-------------------------------------------------------------------------------
+BEGIN
+
+	A1[1,1]=
+	A1[1,2]=
+	A1[1,2]=
+	A1[2,1]=
+	A1[2,2]=
+	A1[2,3]=
+	A1[3,1]=
+	A1[3,2]=
+	A1[3,3]=
+	A2[1,1] =1
+	A2[2,1] =1
+	A2[3,1] =1
+
+	A3 = mul_mx(a1,a2)
+	i=1
+	j=1
+	
+	WRITE('M1',CR)
+	FOR i=1 TO 3 DO
+		WRITE(a1[i,1]::3::1,a1[i,2]::3::1,a1[i,3]::3::1,'    ',a2[i,1]::3::1,a2[i,2]::3::1,a2[i,3]::3::1)
+		WRITE(CR)
+	ENDFOR
+
+
+	WRITE('M3',CR)
+	FOR i=1 TO 3 DO
+		FOR j=1 TO 3 DO
+			WRITE(a3[i,j]::3::1)
+		ENDFOR
+		WRITE(CR)
+	ENDFOR
+	
+	WRITE(det_Mx(A3))
+END Test_MX

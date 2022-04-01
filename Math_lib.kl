@@ -2,6 +2,7 @@ PROGRAM mAth_lib
 -------------------------------------------------------------------------------
 %ENVIRONMENT REGOPE
 
+ROUTINE kramer(A, D: ARRAY [*,*] OF REAL)  : ARRAY[*,*] OF REAL FROM Matrix_lib
 ROUTINE fill_MX(A11, A12, A13, A21, A22, A23, A31, A32, A33 :  REAL)  : ARRAY[*,*] OF REAL FROM Matrix_lib
 --=================fill frame for coordinate============================
 ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR 
@@ -126,19 +127,51 @@ END Proj_XY
 ROUTINE Cross_PNT (F_L, F_P: XYZWPR): XYZWPR -- frame line frame plate
 VAR
 	pl1, pl2, pl3, pl4, pp1, pp2, pp3 , TMP_FRM: XYZWPR
-	Mx,Ma, Mc : ARRAY [3,3] OF REAL 
+	M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL 
 	
 
 BEGIN
+	-- get two point on Z axis and two random point
 	Pl1 = F_L
 	Pl2 = F_L : fill_prm(0,0,1000,	0,0,0)
 	Pl3 = F_L : fill_prm(0,1000,500,	0,0,0)
 	Pl4 = F_L : fill_prm(1000,0,500,	0,0,0)
-	Ma = fill_MX(0,0,0,
-				  0,0,0,
-				  0,0,0)
 	
 	
+	
+	
+	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
+				  PL2.x,	PL2.y,	PL2.z,
+				  PL3.x,	PL3.y,	PL3.z)
+	
+	Mc = fill_MX(1,	0,	0,
+				 1,	0,	0,
+				 1,	0,	0)
+	
+	M1 = kramer(Ma, Mc)-- coefficient 1st plate
+	
+	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
+				  PL2.x,	PL2.y,	PL2.z,
+				  PL4.x,	PL4.y,	PL4.z)
+	M2 = kramer(Ma, Mc) -- coefficient 2nd plate
+	
+	Ma = fill_MX(Pp1.x,	PP1.y,	Pp1.z,
+				  Pp2.x,	Pp2.y,	Pp2.z,
+				  Pp3.x,	Pp3.y,	Pp3.z)
+	M3 = kramer(Ma, Mc) -- coefficient main plate 
+	
+	Ma = fill_MX(M1[1,1],	M1[2,1],	M1[3,1],
+				  M2[1,1],	M2[2,1],	M2[3,1],
+				  M3[1,1],	M3[2,1],	M3[3,1])
+				  
+	M3 = kramer(Ma, Mc) -- cross point
+	
+	TMP_FRM.X = M3[1,1]
+	TMP_FRM.Y = M3[2,1]
+	TMP_FRM.Z = M3[3,1]
+	TMP_FRM.W = 0
+	TMP_FRM.P = 0
+	TMP_FRM.R = 0
 	
 	RETURN(TMP_FRM)
 END Cross_PNT

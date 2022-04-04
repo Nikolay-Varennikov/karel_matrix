@@ -4,41 +4,65 @@ PROGRAM Test_MX
 
 VAR
 STS, i,j : INTEGER 
-A1, A2, A3 : ARRAY [3,3] OF REAL
+M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL
+F_l, F_P, PL1,PL2,PL3, PL4, PP1, PP2, PP3, TMP_FRM: XYZWPR
 
-
+ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR FROM Math_Lib
 ROUTINE MUL_MX(M1, M2 : ARRAY[*,*] OF REAL): ARRAY[*,*] OF REAL FROM Matrix_lib
 ROUTINE det_MX(A : ARRAY[*,*] OF REAL):  REAL FROM Matrix_lib
 ROUTINE fill_MX(A11, A12, A13, A21, A22, A23, A31, A32, A33 :  REAL)  : ARRAY[*,*] OF REAL FROM Matrix_lib
 ROUTINE kramer(A, D: ARRAY [*,*] OF REAL)  : ARRAY[*,*] OF REAL FROM Matrix_lib
 -------------------------------------------------------------------------------
 BEGIN
-
-	A1 = fill_MX( 2,  5,  4,
-				  1,  3,  2,
-				  2, 10,  9)
+	F_L = GET_POS_REG(1, STS) -- read frame of line
+	F_P = GET_POS_REG(2, STS) -- read frame of plate
 	
-	A2 = fill_MX( 30,  0,   0,
-				  150,  0,   0,
-				  110,  0,  0)
-
-	A3 = kramer(a1,a2)
+		-- get two point on Z axis and two random point
+	Pl1 = F_L
+	Pl2 = F_L : fill_prm(0,0,1000,	0,0,0)
+	Pl3 = F_L : fill_prm(0,1000,500,	0,0,0)
+	Pl4 = F_L : fill_prm(1000,0,500,	0,0,0)
+	
+	PP1 = fill_prm(0,0,0,	0,0,0)--F_P
+	PP2 =fill_prm(0,1000,1000,	0,0,0)-- F_P : fill_prm(0,1000,0,	0,0,0)
+	PP3 =fill_prm(500,500,0,	0,0,0)-- F_P : fill_prm(1000,0,0,	0,0,0)
 	
 	
-	WRITE('M1',CR)
-	FOR i=1 TO 3 DO
-		WRITE(a1[i,1]::3::1,		a1[i,2]::3::1,		a1[i,3]::3::1,		'    ',a2[i,1]::3::1,a2[i,2]::3::1,a2[i,3]::3::1)
-		WRITE(CR)
-	ENDFOR
-
-
-	WRITE('M3',CR)
-	FOR i=1 TO 3 DO
-		FOR j=1 TO 3 DO
-			WRITE(a3[i,j]::3::1)
-		ENDFOR
-		WRITE(CR)
-	ENDFOR
 	
-	WRITE(det_Mx(A1)::8::2 )
+	
+	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
+				  PL2.x,	PL2.y,	PL2.z,
+				  PL3.x,	PL3.y,	PL3.z)
+				
+	
+	Mc = fill_MX(1,	0,	0,
+				 1,	0,	0,
+				 1,	0,	0)			 
+	M1 = kramer(Ma, Mc)-- coefficient 1st plate
+		
+	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
+				  PL2.x,	PL2.y,	PL2.z,
+				  PL4.x,	PL4.y,	PL4.z)
+	M2 = kramer(Ma, Mc) -- coefficient 2nd plate
+			
+	Ma = fill_MX(Pp1.x,	PP1.y,	Pp1.z,
+				  Pp2.x,	Pp2.y,	Pp2.z,
+				  Pp3.x,	Pp3.y,	Pp3.z)				
+	M3 = kramer(Ma, Mc) -- coefficient main plate 
+	
+	Ma = fill_MX(M1[1,1],	M1[2,1],	M1[3,1],
+				  M2[1,1],	M2[2,1],	M2[3,1],
+				  M3[1,1],	M3[2,1],	M3[3,1])				  
+	M3 = kramer(Ma, Mc) -- cross point
+			
+	TMP_FRM.X = M3[1,1]
+	TMP_FRM.Y = M3[2,1]
+	TMP_FRM.Z = M3[3,1]
+	TMP_FRM.W = F_P.W
+	TMP_FRM.P =  F_P.P
+	TMP_FRM.R =  F_P.R
+	TMP_FRM.CONFIG_data = F_P.CONFIG_data
+	
+	Set_pos_reg(3, TMP_FRM, sts)
+
 END Test_MX

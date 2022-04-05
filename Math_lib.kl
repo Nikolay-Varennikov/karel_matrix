@@ -124,7 +124,7 @@ END Proj_XY
 --=========================
 
 --=================Crossing Point of line and plate===========================
-ROUTINE Cross_PNT (F_L, F_P: XYZWPR): XYZWPR -- frame line frame plate
+ROUTINE Cross_PNT (Line_frame, Plate_frame: XYZWPR): XYZWPR -- FL - frame line, FP - frame plate
 VAR
 	pl1, pl2, pl3, pl4, pp1, pp2, pp3 , TMP_FRM: XYZWPR
 	M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL 
@@ -132,15 +132,15 @@ VAR
 
 BEGIN
 	-- get two point on Z axis and two point out of Z -axis
-	Pl1 = F_L
-	Pl2 = F_L : fill_prm(0,0,1000,	0,0,0)
-	Pl3 = F_L : fill_prm(0,1000,500,	0,0,0)
-	Pl4 = F_L : fill_prm(1000,0,500,	0,0,0)
+	Pl1 = Line_frame
+	Pl2 = Line_frame : fill_prm(0,0,1000,	0,0,0)
+	Pl3 = Line_frame : fill_prm(0,1000,500,	0,0,0)
+	Pl4 = Line_frame : fill_prm(1000,0,500,	0,0,0)
 	
 		-- get 3-point on XY-plate
-	PP1 = F_P
-	PP2 = F_P : fill_prm(1000,0,0,	0,0,0)
-	PP3 = F_P : fill_prm(0,1000,0,	0,0,0)
+	PP1 = Plate_frame
+	PP2 = Plate_frame : fill_prm(1000,0,0,	0,0,0)
+	PP3 = Plate_frame : fill_prm(0,1000,0,	0,0,0)
 	
 	
 	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
@@ -172,13 +172,101 @@ BEGIN
 	TMP_FRM.X = M3[1,1]
 	TMP_FRM.Y = M3[2,1]
 	TMP_FRM.Z = M3[3,1]
-	TMP_FRM.W = F_P.W
-	TMP_FRM.P =  F_P.P
-	TMP_FRM.R =  F_P.R
-	TMP_FRM.CONFIG_data = F_P.CONFIG_data
+	TMP_FRM.W = 0
+	TMP_FRM.P =  0
+	TMP_FRM.R =  0
 	
 	RETURN(TMP_FRM)
 END Cross_PNT
+
+--=================Crossing Line of two plate===========================
+ROUTINE Cross_Line (Plate1, Plate2: XYZWPR): XYZWPR -- FL frame line  FPframe plate
+VAR
+	p1, p2, p3, p4, p5, p6, TMP_FRM: XYZWPR
+	M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL 
+	flag : BOOLEAN
+	i : INTEGER
+
+BEGIN
+	-- get 3-point on XY-plate of 1st plate
+	P1 = Plate1
+	P2 = Plate1 : fill_prm(0,1000,0,	0,0,0)
+	P3 = Plate1 : fill_prm(1000,0,0,	0,0,0)
+	
+	
+	-- get 3-point on XY-plate of 2nd plate
+	P4 = Plate2
+	P5 = Plate2 : fill_prm(0,1000,0,	0,0,0)
+	P6 = Plate2 : fill_prm(1000,0,0,	0,0,0)
+	
+	
+	Ma = fill_MX(P1.x,	P1.y,	P1.z,
+				  P2.x,	P2.y,	P2.z,
+				  P3.x,	P3.y,	P3.z)
+	
+	Mc = fill_MX(1,	0,	0,
+				 1,	0,	0,
+				 1,	0,	0)
+	
+	M1 = kramer(Ma, Mc)-- coefficient 1st plate
+	
+	Ma = fill_MX(P4.x,	P4.y,	P4.z,
+				  P5.x,	P5.y,	P5.z,
+				  P6.x,	P6.y,	P6.z)
+	M2 = kramer(Ma, Mc) -- coefficient 2nd plate
+	
+	-- calculate 1st point for X =1
+	Ma = fill_MX(M1[1,1],	M1[2,1],		M1[3,1],
+				  M2[1,1],	M2[2,1],		M2[3,1],
+				  1,			0,			0)
+				  
+	M3 = kramer(Ma, Mc) -- first point of intersection
+	 
+	 -- check zero matrix
+	 flag = FALSE
+	 FOR i = 1 TO 3 DO
+	 	IF M3[i,1] <> 0 THEN
+	 		flag = TRUE
+	 	ENDIF
+	 ENDFOR
+	
+	--IF NOT(flag) THEN --solution exists
+		-- save 1st point on cross line
+		P1.X = M3[1,1]
+		P1.Y = M3[2,1]
+		P1.Z = M3[3,1]
+		
+	-- calculate 2nd point for X=1000
+		Mc[3,1] = 1000
+
+		M3 = kramer(Ma, Mc) -- 2nd point of intersection
+		 
+	
+		 -- check zero matrix
+		 flag = FALSE
+		 FOR i = 1 TO 3 DO
+		 	IF M3[i,1] <> 0 THEN
+	 			flag = TRUE
+	 		ENDIF
+		 ENDFOR
+		 
+		P2.X = M3[1,1]
+		P2.Y = M3[2,1]
+		P2.Z = M3[3,1] 
+		
+		-- get 3rd point on XY plate fist plate
+		P3 = Plate2
+	
+	TMP_FRM = FRAME(P1, P2, P3)	
+	
+	--offset frame for handy testing
+	P4 = INV(TMP_FRM) : Plate1
+	
+	
+	Tmp_FRM = TMP_FRM : fill_prm(P4.X,0,0,  0,0,0)
+	
+	RETURN(TMP_FRM)
+END Cross_Line
 --=========================
 
 BEGIN

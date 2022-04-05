@@ -8,13 +8,13 @@ M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL
 F_l, F_P, TMP_FRM: XYZWPR
 
 ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR FROM Math_Lib
-ROUTINE Cross_PNT (F_L, F_P: XYZWPR): XYZWPR FROM Math_Lib
+ROUTINE Cross_line (Plate1, Plate2: XYZWPR): XYZWPR FROM Math_Lib
 -------------------------------------------------------------------------------
 BEGIN
 	F_L = GET_POS_REG(1, STS) -- read frame of line
 	F_P = GET_POS_REG(2, STS) -- read frame of plate
 	
-	TMP_FRM = Cross_PNT(F_l, F_P)
+	TMP_FRM = Cross_line(F_l, F_P)
 
 	
 	Set_pos_reg(3, TMP_FRM, sts)

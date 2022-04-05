@@ -121,9 +121,11 @@ ROUTINE kramer(A, D: ARRAY [*,*] OF REAL)  : ARRAY[*,*] OF REAL
 VAR 
 	X: ARRAY [3,3] OF REAL
 	D0, D1, D2, D3 : REAL
-	i : INTEGER
+	i, status : INTEGER
 BEGIN
-
+	
+	status = 1
+	
 	D0 = det_mx(A) --calc main determinant
 	IF D0 <>0 THEN -- check Kramer Ok
 		-- fill 1 extended matrix
@@ -149,12 +151,19 @@ BEGIN
 		ENDFOR
 		
 		D3 = det_Mx(X) -- 1st det
-	ENDIF
+	
 		
 		x= fill_Mx ( D1/D0, 0 , 0,
 				     D2/D0, 0 , 0,
 				     D3/D0, 0 , 0)
-		
+		status = 0
+	else 	--if we cant use kramer
+		x= fill_Mx(0,0,0,  
+					0,0,0,
+					0,0,0)
+		status = 2 --main determinant = 0
+	ENDIF
+	
 	RETURN(X)
 END kramer
 --=========================

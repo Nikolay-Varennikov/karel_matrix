@@ -131,13 +131,16 @@ VAR
 	
 
 BEGIN
-	-- get two point on Z axis and two random point
+	-- get two point on Z axis and two point out of Z -axis
 	Pl1 = F_L
 	Pl2 = F_L : fill_prm(0,0,1000,	0,0,0)
 	Pl3 = F_L : fill_prm(0,1000,500,	0,0,0)
 	Pl4 = F_L : fill_prm(1000,0,500,	0,0,0)
 	
-	
+		-- get 3-point on XY-plate
+	PP1 = F_P
+	PP2 = F_P : fill_prm(1000,0,0,	0,0,0)
+	PP3 = F_P : fill_prm(0,1000,0,	0,0,0)
 	
 	
 	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
@@ -169,9 +172,10 @@ BEGIN
 	TMP_FRM.X = M3[1,1]
 	TMP_FRM.Y = M3[2,1]
 	TMP_FRM.Z = M3[3,1]
-	TMP_FRM.W = 0
-	TMP_FRM.P = 0
-	TMP_FRM.R = 0
+	TMP_FRM.W = F_P.W
+	TMP_FRM.P =  F_P.P
+	TMP_FRM.R =  F_P.R
+	TMP_FRM.CONFIG_data = F_P.CONFIG_data
 	
 	RETURN(TMP_FRM)
 END Cross_PNT

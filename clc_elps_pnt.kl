@@ -1,0 +1,79 @@
+PROGRAM clc_elps_pnt
+-------------------------------------------------------------------------------
+%ENVIRONMENT REGOPE
+
+VAR
+STATUS : INTEGER 
+
+	pos_phs IN CMOS FROM Surf_bank : REAL
+	PSR_en IN CMOS FROM Surf_bank : BOOLEAN
+	pos_conf IN CMOS FROM Surf_bank : CONFIG
+	PNULL IN CMOS FROM Surf_bank : XYZWPR
+	Count IN CMOS FROM Surf_bank : INTEGER
+	
+	ORI_rel IN CMOS FROM Surf_bank : BOOLEAN
+	ORI_W, ORI_P, ORI_R IN CMOS FROM Surf_bank : REAL
+
+	Ax_Frame, Pl_frame, Point, P1,P2,P3 : XYZWPR
+	Z,R,alf : REAL
+
+	r_Tmp : REAL
+	data_type, i_tmp: INTEGER
+	s_Tmp: STRING[8]
+	b_t : BOOLEAN
+	Jpos_ar : ARRAY [6] OF REAL
+	ext_pos: JOINTPOS6
+
+ROUTINE Cross_PNT (Line_frame, Plate_frame: XYZWPR): XYZWPR  FROM Math_lib
+ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR FROM math_lib
+--------------------------------------------------------------------------------------------------
+BEGIN
+--------------------------------------------------------------------------------------------------
+
+--===============LOAD parameters===================
+--Z distination coordinate
+	GET_TPE_PRM(1, data_type, i_Tmp, r_TMP, s_Tmp, STATUS)
+	Z = i_Tmp + r_Tmp
+	
+--R distination coordinate
+	GET_TPE_PRM(2, data_type, i_Tmp, r_TMP, s_Tmp, STATUS)
+	R = i_Tmp + r_Tmp
+
+--Alfa distination coordinate
+	GET_TPE_PRM(3, data_type, i_Tmp, r_TMP, s_Tmp, STATUS)
+	Alf = i_Tmp + r_Tmp
+
+--axis frame 
+	Ax_Frame = GET_POS_REG(10,STATUS,1)
+	
+--plate frame 
+	Pl_frame = GET_POS_REG(9,STATUS,1)
+	
+		
+--=================CALCULATION===================	
+		
+	Point = Ax_frame : fill_prm(0,0,0, 0,0, Alf + pos_phs) : fill_prm(R,0,0, 0,0,0) -- go to defined radius and angle
+	P1 = Cross_PNT(Point, Pl_frame) -- cross point Z axis and Plate
+	
+	IF NOT(ORI_REL) THEN
+		Point = P1: fill_prm(0,0,0, ORI_W, ORI_P, ORI_r) : fill_PRM(0,0,0,  0,0, - Alf - pos_phs)  -- if independent orientation
+	ELSE
+		Point = P1 : fill_prm(0,0,0, ORI_W, ORI_P, ORI_R) -- if relstive orientation
+	ENDIF
+	
+	Point.CONFIG_DATA = pos_conf
+	
+	FOR i_TMP = 1 TO 6 DO --set position of positioner
+		Jpos_ar[i_Tmp] = 0
+	ENDFOR
+
+	IF PSR_EN THEN
+		Jpos_ar[1]=-Alf
+	ENDIF
+ 	CNV_REL_JPOS(Jpos_ar, ext_pos, STATUS)
+		
+	SET_POS_REG(11, Point, STATUS,1)
+	SET_JPOS_REG(11,ext_pos,STATUS,2)
+	
+
+END clc_elps_pnt

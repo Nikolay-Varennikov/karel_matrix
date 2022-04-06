@@ -16,6 +16,7 @@ BEGIN
 	
 	TMP_FRM = Cross_line(F_l, F_P)
 
+	uframe[1] = TMP_frm
 	
 	Set_pos_reg(3, TMP_FRM, sts)
 

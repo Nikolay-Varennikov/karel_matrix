@@ -242,7 +242,7 @@ BEGIN
 		M3 = kramer(Ma, Mc) -- 2nd point of intersection
 		 
 	
-		 -- check zero matrix
+	-- check zero matrix
 		 flag = FALSE
 		 FOR i = 1 TO 3 DO
 		 	IF M3[i,1] <> 0 THEN
@@ -254,10 +254,17 @@ BEGIN
 		P2.Y = M3[2,1]
 		P2.Z = M3[3,1] 
 		
-		-- get 3rd point on XY plate fist plate
-		P3 = Plate2
+	-- get 3rd point on XY plate fist plate
+		P3 = Plate1
 	
 	TMP_FRM = FRAME(P1, P2, P3)	
+	
+	-- check co-directional new Z width Z of plate1	
+	P4= INV(tmp_frm) : Plate1 : fill_prm(0,0,1000, 0,0,0)
+	
+	IF P4.Z < 0 THEN 
+		TMP_FRM = TMP_FRM : fill_prm(0,0,0, 180,0,0)		-- allign new Z width Z of plate1
+	ENDIF 
 	
 	--offset frame for handy testing
 	P4 = INV(TMP_FRM) : Plate1

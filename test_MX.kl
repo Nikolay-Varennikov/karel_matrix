@@ -1,6 +1,7 @@
 PROGRAM Test_MX
 -------------------------------------------------------------------------------
 %ENVIRONMENT REGOPE
+%ENVIRONMENT SYSDEF
 
 VAR
 STS, i,j : INTEGER 
@@ -16,7 +17,7 @@ BEGIN
 	
 	TMP_FRM = Cross_line(F_l, F_P)
 
-	uframe[1] = TMP_frm
+	$MNUFRAME[1, 1] = tmp_frm
 	
 	Set_pos_reg(3, TMP_FRM, sts)
 

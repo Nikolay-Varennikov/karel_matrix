@@ -124,7 +124,7 @@ END Proj_XY
 --=========================
 
 --=================Crossing Point of line and plate===========================
-ROUTINE Cross_PNT (Line_frame, Plate_frame: XYZWPR): XYZWPR -- FL - frame line, FP - frame plate
+ROUTINE Cross_PNT (Line_frame, Plate_frame: XYZWPR): XYZWPR 
 VAR
 	pl1, pl2, pl3, pl4, pp1, pp2, pp3 , TMP_FRM: XYZWPR
 	M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL 
@@ -172,9 +172,9 @@ BEGIN
 	TMP_FRM.X = M3[1,1]
 	TMP_FRM.Y = M3[2,1]
 	TMP_FRM.Z = M3[3,1]
-	TMP_FRM.W = 0
-	TMP_FRM.P =  0
-	TMP_FRM.R =  0
+	TMP_FRM.W = Line_frame.W
+	TMP_FRM.P =  Line_frame.P
+	TMP_FRM.R =  Line_frame.R
 	
 	RETURN(TMP_FRM)
 END Cross_PNT

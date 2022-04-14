@@ -56,7 +56,7 @@ BEGIN
 -- load  referent frame
 	REF_frm = GET_POS_REG(10,STS)	
 	
---Calculate Frame which alligned  with measured PLATE
+--Calculate Frame which alligned  with measured PLANE
 	Plane = FRAME(P5,P7,P6)
 		
 -- calc Projection of measurment point

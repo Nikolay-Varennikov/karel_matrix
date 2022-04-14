@@ -26,6 +26,7 @@ ROUTINE Calc_CNTR (P1, P2, P3, C: XYZWPR; R:REAL) FROM Math_Lib
 ROUTINE Dist (P1, P2: XYZWPR) :REAL FROM Math_Lib
 ROUTINE CNTR_GRAV(P1,P2,P3,P4: XYZWPR): XYZWPR FROM Math_Lib
 ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR FROM Math_Lib
+ROUTINE Cross_PNT (Line_frame, plane_frame: XYZWPR): XYZWPR  FROM Math_Lib
 -------------------------------------------------------------------------------
 BEGIN
 
@@ -73,18 +74,18 @@ BEGIN
 	
 	C02 = CNTR_GRAV(C1, C2, C3, C4)
 	
--- ñalc Frame with X align to cilinder axis	
+-- ñalc Frame with X align to cilinder axis, XY plane parallel XZ of REF_FRM
 	
-	C00 = FRAME(C01, C02, REF_FRM : Fill_PRM(1000,0,0,0,0,0))
+	C00 = FRAME(C01, C02, Fill_PRM(C01.X, C01.Y, 
+		C01.Z, REF_FRM.W, REF_FRM.P, REF_FRM.R):FILL_PRM(1000,0,0, 0,0,0))
+		
+--rotate frame
+	C00 = C00 : Fill_prm(0,0,0,	90,0,0): Fill_prm(0,0,0,	0,90,0)
 	
--- allign  to edge points 
---!!!!!!!!!!!!!!!!!! NOT strong method!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	C01 = INV(C00) : REF_FRM --cross point XY ref plane and Cylinder Axis
+--  offset  to  new frame to XY of REF_frm
+
+	C01 = Cross_PNT(C00, REF_frm)
 	
-	C00 = C00 : Fill_prm(C01.x, 0, 0, 0, 90, 0) -- ofset origin COO to C01 and till Z->X
-	
-	C00 = C00 : Fill_prm(0, 0, 0, 0, 0, 90)	--Till X->Y
-	
-	SET_POS_REG(11,C00,STS,1)
+	SET_POS_REG(11, C01, STS, 1)
 	
 END CALC_AX_FRM

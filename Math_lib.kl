@@ -123,8 +123,8 @@ BEGIN
 END Proj_XY
 --=========================
 
---=================Crossing Point of line and plate===========================
-ROUTINE Cross_PNT (Line_frame, Plate_frame: XYZWPR): XYZWPR 
+--=================Crossing Point of line and plane===========================
+ROUTINE Cross_PNT (Line_frame, plane_frame: XYZWPR): XYZWPR 
 VAR
 	pl1, pl2, pl3, pl4, pp1, pp2, pp3 , TMP_FRM: XYZWPR
 	M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL 
@@ -137,31 +137,32 @@ BEGIN
 	Pl3 = Line_frame : fill_prm(0,1000,500,	0,0,0)
 	Pl4 = Line_frame : fill_prm(1000,0,500,	0,0,0)
 	
-		-- get 3-point on XY-plate
-	PP1 = Plate_frame
-	PP2 = Plate_frame : fill_prm(1000,0,0,	0,0,0)
-	PP3 = Plate_frame : fill_prm(0,1000,0,	0,0,0)
+		-- get 3-point on XY-plane
+	PP1 = plane_frame
+	PP2 = plane_frame : fill_prm(1000,0,0,	0,0,0)
+	PP3 = plane_frame : fill_prm(0,1000,0,	0,0,0)
 	
 	
 	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
 				  PL2.x,	PL2.y,	PL2.z,
 				  PL3.x,	PL3.y,	PL3.z)
 	
+	-- suppose the plane dosn't pass throught the origin
 	Mc = fill_MX(1,	0,	0,
 				 1,	0,	0,
 				 1,	0,	0)
 	
-	M1 = kramer(Ma, Mc)-- coefficient 1st plate
+	M1 = kramer(Ma, Mc)-- coefficient 1st plane
 	
 	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
 				  PL2.x,	PL2.y,	PL2.z,
 				  PL4.x,	PL4.y,	PL4.z)
-	M2 = kramer(Ma, Mc) -- coefficient 2nd plate
+	M2 = kramer(Ma, Mc) -- coefficient 2nd plane
 	
 	Ma = fill_MX(Pp1.x,	PP1.y,	Pp1.z,
 				  Pp2.x,	Pp2.y,	Pp2.z,
 				  Pp3.x,	Pp3.y,	Pp3.z)
-	M3 = kramer(Ma, Mc) -- coefficient main plate 
+	M3 = kramer(Ma, Mc) -- coefficient main plane 
 	
 	Ma = fill_MX(M1[1,1],	M1[2,1],	M1[3,1],
 				  M2[1,1],	M2[2,1],	M2[3,1],
@@ -179,8 +180,8 @@ BEGIN
 	RETURN(TMP_FRM)
 END Cross_PNT
 
---=================Crossing Line of two plate===========================
-ROUTINE Cross_Line (Plate1, Plate2: XYZWPR): XYZWPR -- FL frame line  FPframe plate
+--=================Crossing Line of two plane===========================
+ROUTINE Cross_Line (plane1, plane2: XYZWPR): XYZWPR -- FL frame line  FPframe plane
 VAR
 	p1, p2, p3, p4, p5, p6, TMP_FRM: XYZWPR
 	M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL 
@@ -188,16 +189,16 @@ VAR
 	i : INTEGER
 
 BEGIN
-	-- get 3-point on XY-plate of 1st plate
-	P1 = Plate1
-	P2 = Plate1 : fill_prm(0,1000,0,	0,0,0)
-	P3 = Plate1 : fill_prm(1000,0,0,	0,0,0)
+	-- get 3-point on XY-plane of 1st plane
+	P1 = plane1
+	P2 = plane1 : fill_prm(0,1000,0,	0,0,0)
+	P3 = plane1 : fill_prm(1000,0,0,	0,0,0)
 	
 	
-	-- get 3-point on XY-plate of 2nd plate
-	P4 = Plate2
-	P5 = Plate2 : fill_prm(0,1000,0,	0,0,0)
-	P6 = Plate2 : fill_prm(1000,0,0,	0,0,0)
+	-- get 3-point on XY-plane of 2nd plane
+	P4 = plane2
+	P5 = plane2 : fill_prm(0,1000,0,	0,0,0)
+	P6 = plane2 : fill_prm(1000,0,0,	0,0,0)
 	
 	
 	Ma = fill_MX(P1.x,	P1.y,	P1.z,
@@ -208,12 +209,12 @@ BEGIN
 				 1,	0,	0,
 				 1,	0,	0)
 	
-	M1 = kramer(Ma, Mc)-- coefficient 1st plate
+	M1 = kramer(Ma, Mc)-- coefficient 1st plane
 	
 	Ma = fill_MX(P4.x,	P4.y,	P4.z,
 				  P5.x,	P5.y,	P5.z,
 				  P6.x,	P6.y,	P6.z)
-	M2 = kramer(Ma, Mc) -- coefficient 2nd plate
+	M2 = kramer(Ma, Mc) -- coefficient 2nd plane
 	
 	-- calculate 1st point for X =1
 	Ma = fill_MX(M1[1,1],	M1[2,1],		M1[3,1],
@@ -254,20 +255,20 @@ BEGIN
 		P2.Y = M3[2,1]
 		P2.Z = M3[3,1] 
 		
-	-- get 3rd point on XY plate fist plate
-		P3 = Plate1
+	-- get 3rd point on XY plane fist plane
+		P3 = plane1
 	
 	TMP_FRM = FRAME(P1, P2, P3)	
 	
-	-- check co-directional new Z width Z of plate1	
-	P4= INV(tmp_frm) : Plate1 : fill_prm(0,0,1000, 0,0,0)
+	-- check co-directional new Z width Z of plane1	
+	P4= INV(tmp_frm) : plane1 : fill_prm(0,0,1000, 0,0,0)
 	
 	IF P4.Z < 0 THEN 
-		TMP_FRM = TMP_FRM : fill_prm(0,0,0, 180,0,0)		-- allign new Z width Z of plate1
+		TMP_FRM = TMP_FRM : fill_prm(0,0,0, 180,0,0)		-- allign new Z width Z of plane1
 	ENDIF 
 	
 	--offset frame for handy testing
-	P4 = INV(TMP_FRM) : Plate1
+	P4 = INV(TMP_FRM) : plane1
 	
 	
 	Tmp_FRM = TMP_FRM : fill_prm(P4.X,0,0,  0,0,0)

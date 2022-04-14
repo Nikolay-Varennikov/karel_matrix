@@ -74,17 +74,26 @@ BEGIN
 	
 	C02 = CNTR_GRAV(C1, C2, C3, C4)
 	
--- ñalc Frame with X align to cilinder axis, XY plane parallel XZ of REF_FRM
+	
+-- ñalc Frame with X align to cilinder axis, XY plane parallel X axis of REF_FRM
 	
 	C00 = FRAME(C01, C02, Fill_PRM(C01.X, C01.Y, 
 		C01.Z, REF_FRM.W, REF_FRM.P, REF_FRM.R):FILL_PRM(1000,0,0, 0,0,0))
-		
+	
 --rotate frame
 	C00 = C00 : Fill_prm(0,0,0,	90,0,0): Fill_prm(0,0,0,	0,90,0)
 	
 --  offset  to  new frame to XY of REF_frm
 
 	C01 = Cross_PNT(C00, REF_frm)
+
+-- align positive Z direction
+	C02 = C01 : fill_Prm(0,0,1000, 0,0,0) -- get point with positive Z in C01
+	C02 = INV(ref_frm) : C02 -- get coordinate in  ref_frm
+
+	IF C02.Z <0 THEN
+		C01 = C01 : Fill_prm(0,0,0,  180,0,0)
+	ENDIF
 	
 	SET_POS_REG(11, C01, STS, 1)
 	

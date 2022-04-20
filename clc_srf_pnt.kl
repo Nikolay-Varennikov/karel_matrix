@@ -14,7 +14,7 @@ STATUS : INTEGER
 	ORI_rel IN CMOS FROM Surf_bank : BOOLEAN
 	ORI_W, ORI_P, ORI_R IN CMOS FROM Surf_bank : REAL
 
-	Ofs, Point, P1,P2,P3 : XYZWPR
+	Ref, Point, P1,P2,P3 : XYZWPR
 	Z,R,alf : REAL
 
 	r_Tmp : REAL
@@ -24,7 +24,7 @@ STATUS : INTEGER
 	Jpos_ar : ARRAY [6] OF REAL
 	ext_pos: JOINTPOS6
 
-
+ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR FROM math_lib
 --------------------------------------------------------------------------------------------------
 BEGIN
 --------------------------------------------------------------------------------------------------
@@ -43,32 +43,18 @@ BEGIN
 	Alf = i_Tmp + r_Tmp
 
 --Offset frame 
-	Ofs = GET_POS_REG(10,STATUS,1)
+	Ref = GET_POS_REG(10,STATUS,1)
 	
 		
 --=================CALCULATION===================	
-	P1= PNULL
-	P3 = PNULL
-	P2 = PNULL
-	
-	P1.Z = Z
-	P1.R = Alf + pos_phs
-	
-	P2.X = R
-	
 	IF NOT(ORI_REL) THEN
-		P2.W = ORI_W
-		P2.P = ORI_P
-		P2.R = ORI_R
-		
-		P3.R = - Alf - pos_phs
+		Point = Ref : fill_prm(0,0,Z, 0,0,Alf + pos_phs)  : fill_prm(R,0,0, 0, 0, -Alf - pos_phs) :
+		 fill_PRM(0,0,0,  0,Ori_P, 0) : fill_PRM(0,0,0,  0, 0, Ori_R)  -- if independent orientation
 	ELSE
-		P3.W = ORI_W
-		P3.P = ORI_P
-		P3.R = ORI_R
+		Point = Ref : fill_prm(0,0,Z, 0,0,Alf + pos_phs) : fill_prm(R,0,0, 0, 0, 0) : fill_PRM(0,0,0,  0,Ori_P, 0) :
+		 fill_PRM(0,0,0,  0, 0, Ori_R)  -- if relative orientation
 	ENDIF
 	
-	Point = Ofs : P1: P2 : P3
 	Point.CONFIG_DATA = pos_conf
 	
 	FOR i_TMP = 1 TO 6 DO

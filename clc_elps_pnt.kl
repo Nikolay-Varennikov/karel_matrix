@@ -55,10 +55,14 @@ BEGIN
 	Point = Ax_frame : fill_prm(0,0,0, 0,0, Alf + pos_phs) : fill_prm(R,0,0, 0,0,0) -- go to defined radius and angle
 	P1 = Cross_PNT(Point, Pl_frame) -- cross point Z axis and Plate
 	
-	IF NOT(ORI_REL) THEN
-		Point = P1: fill_prm(0,0,0, ORI_W, ORI_P, ORI_r) : fill_PRM(0,0,0,  0,0, - Alf - pos_phs)  -- if independent orientation
-	ELSE
-		Point = P1 : fill_prm(0,0,0, ORI_W, ORI_P, ORI_R) -- if relstive orientation
+	IF NOT(ORI_REL) THEN  -- if independent orientation
+		Point = P1  : fill_prm(0,0,0, 0,ORI_P,0) -- get till around Y - tangent to path
+		
+		P2 = INV(Point) : Ax_Frame	 -- get coordinate Referent relative Point
+		Point = Point : fill_PRM(0,0,0,  0,0, P2.R) : fill_prm(0,0,0, 0, 0,ORI_R) -- turn to allign X width XZ plate of refernerent and then turn Ori_R
+		 
+	ELSE -- if relative orientation
+		Point = P1 : fill_prm(0,0,0, 0,ORI_P,0)  : fill_prm(0,0,0, 0,0,ORI_R)
 	ENDIF
 	
 	Point.CONFIG_DATA = pos_conf

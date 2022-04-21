@@ -47,12 +47,17 @@ BEGIN
 	
 		
 --=================CALCULATION===================	
-	IF NOT(ORI_REL) THEN
-		Point = Ref : fill_prm(0,0,Z, 0,0,Alf + pos_phs)  : fill_prm(R,0,0, 0, 0, -Alf - pos_phs) :
-		 fill_PRM(0,0,0,  0,Ori_P, 0) : fill_PRM(0,0,0,  0, 0, Ori_R)  -- if independent orientation
-	ELSE
-		Point = Ref : fill_prm(0,0,Z, 0,0,Alf + pos_phs) : fill_prm(R,0,0, 0, 0, 0) : fill_PRM(0,0,0,  0,Ori_P, 0) :
-		 fill_PRM(0,0,0,  0, 0, Ori_R)  -- if relative orientation
+	IF NOT(ORI_REL) THEN -- if independent orientation
+	
+		Point = Ref : fill_prm(0,0,Z, 0,0,Alf + pos_phs)  : fill_prm(R,0,0, 0, Ori_P, 0)
+		P2 = INV(Point) : Ref	 -- get coordinate Referent relative Point
+		Point = Point : fill_PRM(0,0,0,  0,0, P2.R) : fill_prm(0,0,0, 0, 0,ORI_R) -- turn to allign X width XZ plate of refernerent and then turn Ori_R
+		 
+	ELSE -- if relative orientation
+	
+		Point = Ref : fill_prm(0,0,Z, 0,0,Alf + pos_phs) : fill_prm(R,0,0, 0, 0, 0) :
+					 fill_PRM(0,0,0,  0,Ori_P, 0) : fill_PRM(0,0,0,  0, 0, Ori_R)  
+	 
 	ENDIF
 	
 	Point.CONFIG_DATA = pos_conf

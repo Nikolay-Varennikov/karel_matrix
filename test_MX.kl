@@ -9,13 +9,13 @@ M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL
 F_l, F_P, TMP_FRM: XYZWPR
 
 ROUTINE Fill_PRM(X,Y,Z,w,p,r : REAL): XYZWPR FROM Math_Lib
-ROUTINE Cross_line (Plate1, Plate2: XYZWPR): XYZWPR FROM Math_Lib
+ROUTINE Cross_PNT_YZ (Line_frame, plane_frame: XYZWPR): XYZWPR FROM Math_Lib
 -------------------------------------------------------------------------------
 BEGIN
 	F_L = GET_POS_REG(1, STS) -- read frame of line
 	F_P = GET_POS_REG(2, STS) -- read frame of plate
 	
-	TMP_FRM = Cross_line(F_l, F_P)
+	TMP_FRM = Cross_PNT_YZ(F_l, F_P)
 
 	$MNUFRAME[1, 1] = tmp_frm
 	

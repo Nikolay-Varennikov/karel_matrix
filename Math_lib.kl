@@ -123,7 +123,7 @@ BEGIN
 END Proj_XY
 --=========================
 
---=================Crossing Point of line and plane===========================
+--=================Crossing Point of Z-line and XY-plane===========================
 ROUTINE Cross_PNT (Line_frame, plane_frame: XYZWPR): XYZWPR 
 VAR
 	pl1, pl2, pl3, pl4, pp1, pp2, pp3 , TMP_FRM: XYZWPR
@@ -131,13 +131,14 @@ VAR
 	
 
 BEGIN
-	-- get two point on Z axis and two point out of Z -axis
+	
+		-- get two point on Z axis and two point out of Z -axis
 	Pl1 = Line_frame
 	Pl2 = Line_frame : fill_prm(0,0,1000,	0,0,0)
 	Pl3 = Line_frame : fill_prm(0,1000,500,	0,0,0)
 	Pl4 = Line_frame : fill_prm(1000,0,500,	0,0,0)
 	
-		-- get 3-point on XY-plane
+		-- get 3-point on XY-plane rame
 	PP1 = plane_frame
 	PP2 = plane_frame : fill_prm(1000,0,0,	0,0,0)
 	PP3 = plane_frame : fill_prm(0,1000,0,	0,0,0)
@@ -147,7 +148,7 @@ BEGIN
 				  PL2.x,	PL2.y,	PL2.z,
 				  PL3.x,	PL3.y,	PL3.z)
 	
-	-- suppose the plane dosn't pass throught the origin
+		-- suppose the plane dosn't pass throught the origin
 	Mc = fill_MX(1,	0,	0,
 				 1,	0,	0,
 				 1,	0,	0)
@@ -179,6 +180,64 @@ BEGIN
 	
 	RETURN(TMP_FRM)
 END Cross_PNT
+
+--=================Crossing Point of X -line and YZ -plane===========================
+ROUTINE Cross_PNT_YZ (Line_frame, plane_frame: XYZWPR): XYZWPR 
+VAR
+	pl1, pl2, pl3, pl4, pp1, pp2, pp3 , TMP_FRM: XYZWPR
+	M1, M2, M3, Ma, Mc : ARRAY [3,3] OF REAL 
+	
+
+BEGIN
+	
+		-- get two point on X axis and two point out of X -axis
+	Pl1 = Line_frame
+	Pl2 = Line_frame : fill_prm(1000,0,0,	0,0,0)
+	Pl3 = Line_frame : fill_prm(0,1000,1000, 	0,0,0)
+	Pl4 = Line_frame : fill_prm(0,-1000,1000,	0,0,0)
+	
+		-- get 3-point on YZ-plane of plane frame
+	PP1 = plane_frame
+	PP2 = plane_frame : fill_prm(0,0,1000,	0,0,0)
+	PP3 = plane_frame : fill_prm(0,1000,0,	0,0,0)
+	
+	
+	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
+				  PL2.x,	PL2.y,	PL2.z,
+				  PL3.x,	PL3.y,	PL3.z)
+	
+		-- suppose the plane dosn't pass throught the origin
+	Mc = fill_MX(1,	0,	0,
+				 1,	0,	0,
+				 1,	0,	0)
+	
+	M1 = kramer(Ma, Mc)-- coefficient 1st plane of line-frame
+	
+	Ma = fill_MX(PL1.x,	PL1.y,	PL1.z,
+				  PL2.x,	PL2.y,	PL2.z,
+				  PL4.x,	PL4.y,	PL4.z)
+	M2 = kramer(Ma, Mc) -- coefficient 2nd plane of line-frame
+	
+	Ma = fill_MX(Pp1.x,	PP1.y,	Pp1.z,
+				  Pp2.x,	Pp2.y,	Pp2.z,
+				  Pp3.x,	Pp3.y,	Pp3.z)
+	M3 = kramer(Ma, Mc) -- coefficient YZ-plane of Plane frame
+	
+	Ma = fill_MX(M1[1,1],	M1[2,1],	M1[3,1],
+				  M2[1,1],	M2[2,1],	M2[3,1],
+				  M3[1,1],	M3[2,1],	M3[3,1])
+				  
+	M3 = kramer(Ma, Mc) -- cross point
+	
+	TMP_FRM.X = M3[1,1]
+	TMP_FRM.Y = M3[2,1]
+	TMP_FRM.Z = M3[3,1]
+	TMP_FRM.W = Line_frame.W
+	TMP_FRM.P =  Line_frame.P
+	TMP_FRM.R =  Line_frame.R
+	
+	RETURN(TMP_FRM)
+END Cross_PNT_YZ
 
 --=================Crossing Line of two plane===========================
 ROUTINE Cross_Line (plane1, plane2: XYZWPR): XYZWPR -- FL frame line  FPframe plane

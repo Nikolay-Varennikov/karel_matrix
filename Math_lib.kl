@@ -73,6 +73,7 @@ VAR
 	Res : XYZWPR
 
 BEGIN
+	
 	Res.X = (P1.X + P2.X + P3.X + P4.X)/4
 	Res.Y = (P1.Y + P2.Y + P3.Y + P4.Y)/4
 	Res.Z = (P1.Z + P2.Z + P3.Z + P4.Z)/4
@@ -283,14 +284,15 @@ BEGIN
 	M3 = kramer(Ma, Mc) -- first point of intersection
 	 
 	 -- check zero matrix
-	 flag = FALSE
-	 FOR i = 1 TO 3 DO
-	 	IF M3[i,1] <> 0 THEN
-	 		flag = TRUE
-	 	ENDIF
-	 ENDFOR
+	-- flag = FALSE
+	 --FOR i = 1 TO 3 DO
+	 --	IF M3[i,1] <> 0 THEN
+	 --		flag = TRUE
+	 --	ENDIF
+	 --ENDFOR
 	
 	--IF NOT(flag) THEN --solution exists
+	
 		-- save 1st point on cross line
 		P1.X = M3[1,1]
 		P1.Y = M3[2,1]
@@ -303,12 +305,12 @@ BEGIN
 		 
 	
 	-- check zero matrix
-		 flag = FALSE
-		 FOR i = 1 TO 3 DO
-		 	IF M3[i,1] <> 0 THEN
-	 			flag = TRUE
-	 		ENDIF
-		 ENDFOR
+	--	 flag = FALSE
+	--	 FOR i = 1 TO 3 DO
+	--	 	IF M3[i,1] <> 0 THEN
+	-- 			flag = TRUE
+	-- 		ENDIF
+	--	 ENDFOR
 		 
 		P2.X = M3[1,1]
 		P2.Y = M3[2,1]
@@ -319,17 +321,18 @@ BEGIN
 	
 	TMP_FRM = FRAME(P1, P2, P3)	
 	
-	-- check co-directional new Z width Z of plane1	
+      -- check co-directional new Z width Z of plane1	
+	-- get point on +Z Axis of Plane 1 in TMP_FRM frame
 	P4= INV(tmp_frm) : plane1 : fill_prm(0,0,1000, 0,0,0)
 	
+	--if  Z<0 then Z of Plane 1 and Z of TMP_FRM co-directional, else they are oposite
 	IF P4.Z < 0 THEN 
 		TMP_FRM = TMP_FRM : fill_prm(0,0,0, 180,0,0)		-- allign new Z width Z of plane1
 	ENDIF 
 	
-	--offset frame for handy testing
+	--offset TMP_FRM to projection Origin of plane1 on cross line
+	
 	P4 = INV(TMP_FRM) : plane1
-	
-	
 	Tmp_FRM = TMP_FRM : fill_prm(P4.X,0,0,  0,0,0)
 	
 	RETURN(TMP_FRM)

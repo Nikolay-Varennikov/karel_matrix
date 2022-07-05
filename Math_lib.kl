@@ -330,7 +330,7 @@ BEGIN
 		TMP_FRM = TMP_FRM : fill_prm(0,0,0, 180,0,0)		-- allign new Z width Z of plane1
 	ENDIF 
 	
-	--offset TMP_FRM to projection Origin of plane1 on cross line
+	--offset TMP_FRM to projection Origin of plane1 on cross line	
 	
 	P4 = INV(TMP_FRM) : plane1
 	Tmp_FRM = TMP_FRM : fill_prm(P4.X,0,0,  0,0,0)

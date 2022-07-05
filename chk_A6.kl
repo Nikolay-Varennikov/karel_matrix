@@ -1,0 +1,73 @@
+PROGRAM chk_A6
+
+---------------------------------------------
+VAR
+pos_conf IN CMOS FROM Surf_bank : CONFIG
+--===========CHK_MIN_dA6_AXIS============
+--check the minimum difference of the current position of the 6th axis 
+--WITH 3 possible options FOR the target Point
+result: INTEGER
+
+
+ROUTINE CHK_MIN_dA6  (POINT : XYZWPR): INTEGER
+
+VAR
+	RES , STATUS : INTEGER
+	A6_1, A6_2, A6_3 : REAL
+	BASE, TOOL, Ref,  P1, P2, P3 : XYZWPR
+	JCUR, J1, J2 , J3 : JOINTPOS6
+	pos1: POSITION
+	Jpos_ex : ARRAY [0] OF REAL
+	Jarr : ARRAY [6] OF REAL
+			
+BEGIN
+	
+
+	
+	
+	$UTOOL=$MNUTOOL[1,$MNUTOOLNUM[1]]
+	
+	pos1 = $MNUFRAME[1,1]
+	BASE= $MNUFRAME[1,1]
+	base=POS(0,0,0,0,0,0,base.config_data)
+	JCUR = CURJPOS  ( 0 , 0)
+	TOOL=$MNUTOOL[1,$MNUTOOLNUM[1]]
+	--TOOL = POS (0,0,0,0,0,0,base.config_data)
+	
+
+	P1=point
+	P2=point
+	P3=point
+	
+	--P1.config_data=pos_conf
+	--P2.config_data=pos_conf
+	--P3.config_data=pos_conf
+	
+	P1.config_data.CFG_TURN_NO3=-1
+	P2.config_data.CFG_TURN_NO3=0
+	P3.config_data.CFG_TURN_NO3=1
+	
+	
+ 	
+ 	POS2JOINT(JCUR, P1 , BASE,TOOL,0,P1.config_data, Jpos_ex, J1 , status)
+ 	POS2JOINT(JCUR, P2 , BASE,TOOL,0,P2.config_data, Jpos_ex, J2 , status)
+ 	POS2JOINT(JCUR, P3 , BASE,TOOL,0,P3.config_data, Jpos_ex, J3 , status)
+ 	
+ 	
+ 	WRITE (CR,'point', point ,CR, 'P2  ',   P2  , CR)
+ 	-- CNV_JPOS_REL ( J2 , jarr , status )
+ 	
+ 	
+ 	WRITE (CR,'point', point ,CR, 'P2  ',   P2  , CR)
+ 	WRITE ('J1  ', J1, CR)    --- 'status-3', status,' ' , jarr[6],CR)
+ 	--CNV_REL_JPOS(P1, J1 , STATUS)
+ 	--CNV_REL_JPOS(P2, J2, STATUS)
+ 	--CNV_REL_JPOS(P3, J3, STATUS)
+
+
+	RETURN (res)
+END CHK_MIN_dA6
+
+BEGIN
+	result = CHK_MIN_dA6(CURPOS  ( 0 , 0))
+END chk_A6
